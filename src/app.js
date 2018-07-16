@@ -2,9 +2,10 @@ import express from 'express';
 import path from 'path';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
-import routes from './routes';
+import quoteRoutes from './routes/quoteRoutes';
 
 const app = express();
+const router = express.Router();
 app.disable('x-powered-by');
 
 // View engine setup
@@ -19,7 +20,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Routes
-app.use('/', routes);
+router.get('/', (req, res) => {
+    res.render('index', { title: 'Express Babel' });
+});
+app.use('/', router);
+router.get('/about', (req, res) => {
+    res.render('index', { title: 'About Express Babel' });
+});
+app.use('/about', router);
+
+app.use('/quotes', quoteRoutes);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
