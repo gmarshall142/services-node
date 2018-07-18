@@ -3,10 +3,21 @@ import path from 'path';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 import quoteRoutes from './routes/quoteRoutes';
+import sequelize from './database/sequelize';
 
 const app = express();
 const router = express.Router();
 app.disable('x-powered-by');
+
+// connect to sequelize
+sequelize
+  .authenticate()
+  .then( () => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database: ', err);
+  });
 
 // View engine setup
 app.set('views', path.join(__dirname, '../views'));
