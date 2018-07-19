@@ -1,10 +1,14 @@
+import sequelize from '../database/sequelize';
 import Quote from '../models/Quote';
 
 exports.quoteFindAll = (req, res) => {
-  Quote.findAll()
-    .then(quotes => {
+  //Quote.findAll()
+  sequelize.query('select * from quotesFindAll();')
+    //.then(quotes => {
+    .then(response => {
       //console.log(`Quotes: ${JSON.stringify(quotes)}`);
-      res.json(quotes);
+      //res.json(quotes);
+      res.json(response[0]);
     })
     .catch(error => {
       console.error(error);
@@ -14,9 +18,13 @@ exports.quoteFindAll = (req, res) => {
 };
 
 exports.quoteFind = (req, res) => {
-  Quote.findById(req.params.quoteId)
-    .then(quote => {
-      res.json(quote);
+  //Quote.findById(req.params.quoteId)
+  sequelize.query(
+    'select * from quotesFindById(:id);',
+    {replacements: {id: req.params.quoteId}, type: sequelize.QueryTypes.SELECT}
+  )
+    .then(response => {
+      res.json(response[0]);
     })
     .catch(error => {
       console.error(error);
@@ -36,11 +44,11 @@ exports.quoteAdd = (req, res) => {
         author_first_name: req.body.author_first_name,
         author_last_name: req.body.author_last_name,
         quote_string: req.body.quote_string,
-        json_attributes: req.body.json_attributes,
+        json_attributes: createAttributes(req.body)
       })
       .save()
       .then(quote => {
-        res.json(quote);
+        res.json(parseAttributes(quote.dataValues));
       })
       .catch(error => {
         console.error(error);
@@ -50,8 +58,30 @@ exports.quoteAdd = (req, res) => {
   }
 };
 
+function createAttributes(payload) {
+  return {
+    "category": payload.category,
+    "comment": payload.comment,
+    "graphic_url": payload.graphic_url,
+    "quote_format": payload.quote_format,
+    "source": payload.source
+  };
+}
+
+function parseAttributes(quote) {
+  quote.category = (quote.json_attributes.category ? quote.json_attributes.category : 0);
+  quote.comment = quote.json_attributes.comment;
+  quote.graphic_url = quote.json_attributes.graphic_url;
+  quote.quote_format = (quote.json_attributes.quote_format ? quote.json_attributes.quote_format : 0);
+  quote.source = quote.json_attributes.source;
+  delete quote.json_attributes;
+  return quote;
+}
+
 exports.quoteUpdate = (req, res) => {
-  req.body.last_updated = Date.now();
+  const quote = req.body;
+  quote.json_attributes = createAttributes(req.body);
+  quote.last_updated = Date.now();
   Quote.update(
     req.body,
     {
@@ -60,7 +90,7 @@ exports.quoteUpdate = (req, res) => {
       plain: true
     })
     .then(results => {
-      res.json(results[1]);
+      res.json(parseAttributes(results[1].dataValues));
     })
     .catch(error => {
       console.error(error);
@@ -70,6 +100,7 @@ exports.quoteUpdate = (req, res) => {
 };
 
 exports.quoteDelete = (req, res) => {
+  const quoteId = req.params.quoteId;
   Quote.destroy({
     where: { id: req.params.quoteId }
   })
@@ -79,7 +110,7 @@ exports.quoteDelete = (req, res) => {
       res.status(400);
       res.send('Delete failed.');
     } else {
-      res.json({ deleted: deletedRecord});
+      res.json({ deleted: deletedRecord, id: quoteId});
     }
   });
 };

@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
@@ -23,6 +24,7 @@ sequelize
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'pug');
 
+app.use(cors());
 app.use(logger('dev', {
   skip: () => app.get('env') === 'test'
 }));
