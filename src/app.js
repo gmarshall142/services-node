@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
+import menuRoutes from './routes/menuRoutes';
 import quoteRoutes from './routes/quoteRoutes';
 import sequelize from './database/sequelize';
 
@@ -42,6 +43,7 @@ router.get('/about', (req, res) => {
 });
 app.use('/about', router);
 
+app.use('/menus', menuRoutes);
 app.use('/quotes', quoteRoutes);
 
 // Catch 404 and forward to error handler
