@@ -43,14 +43,14 @@ function getSubmenus(menuItem, menuData) {
 }
 
 function getRoutingPath(item) {
+  const routerPath = (item.routerpath ? item.routerpath : item.label);
   if (item.syspath === '/' || item.syspath === '/Administration') {
-    const routerPath = (item.routerpath ? item.routerpath : item.label);
     return `/${routerPath.toLowerCase()}`;
     // } else if (item.syspath === '/Administration/task') {
     //   // TODO: replace hard coded 'Administration' to a map of system submenus
     //   return `${item.pathname.toLowerCase()}`;
   } else {
-    return `/apps/${item.appid}/${item.pageid}`;
+    return `/apps/${routerPath.toLowerCase()}`;
   }
 }
 
