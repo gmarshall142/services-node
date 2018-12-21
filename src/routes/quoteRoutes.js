@@ -10,6 +10,9 @@ const quoteRoutes = Router();
 //   res.render('index', { title: 'Express Babel' });
 // });
 
+quoteRoutes.get('/formats/', controller.formatFindAll);
+quoteRoutes.get('/categories/', controller.categoryFindAll);
+
 quoteRoutes.get('/', controller.quoteFindAll);
 quoteRoutes.post('/', controller.quoteAdd);
 quoteRoutes.get('/:quoteId', controller.quoteFind);

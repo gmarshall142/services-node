@@ -1,5 +1,9 @@
 import sequelize from '../database/sequelize';
 import Quote from '../models/Quote';
+import QuoteFormat from '../models/QuoteFormat';
+import QuoteCategory from '../models/QuoteCategory';
+import Helper from '../modules/helper';
+const helper = new Helper();
 
 exports.quoteFindAll = (req, res) => {
   //Quote.findAll()
@@ -38,13 +42,17 @@ exports.quoteAdd = (req, res) => {
     res.status(400);
     res.send('Quote is required');
   } else {
+    const categoryid = (req.body.categoryid === 0 ? null : req.body.categoryid);
     Quote
       .build( {
         version: req.body.version,
         author_first_name: req.body.author_first_name,
         author_last_name: req.body.author_last_name,
         quote_string: req.body.quote_string,
-        json_attributes: createAttributes(req.body)
+        categoryid: categoryid,
+        formatid: req.body.formatid,
+        jsondata: createAttributes(req.body),
+        createdat: Date.now()
       })
       .save()
       .then(quote => {
@@ -60,28 +68,23 @@ exports.quoteAdd = (req, res) => {
 
 function createAttributes(payload) {
   return {
-    "category": payload.category,
     "comment": payload.comment,
     "graphic_url": payload.graphic_url,
-    "quote_format": payload.quote_format,
     "source": payload.source
   };
 }
 
 function parseAttributes(quote) {
-  quote.category = (quote.json_attributes.category ? quote.json_attributes.category : 0);
-  quote.comment = quote.json_attributes.comment;
-  quote.graphic_url = quote.json_attributes.graphic_url;
-  quote.quote_format = (quote.json_attributes.quote_format ? quote.json_attributes.quote_format : 0);
-  quote.source = quote.json_attributes.source;
-  delete quote.json_attributes;
+  quote.comment = quote.jsondata.comment;
+  quote.graphic_url = quote.jsondata.graphic_url;
+  quote.source = quote.jsondata.source;
+  delete quote.jsondata;
   return quote;
 }
 
 exports.quoteUpdate = (req, res) => {
   const quote = req.body;
-  quote.json_attributes = createAttributes(req.body);
-  quote.last_updated = Date.now();
+  quote.jsondata = createAttributes(req.body);
   Quote.update(
     req.body,
     {
@@ -114,3 +117,14 @@ exports.quoteDelete = (req, res) => {
     }
   });
 };
+
+// ===== FORMAT ===============================
+exports.formatFindAll = (req, res) => {
+  helper.tableFindAll(req, res, QuoteFormat, { order: [['name', 'ASC']] }, 'quote formats');
+};
+
+// ===== CATEGORIES ===============================
+exports.categoryFindAll = (req, res) => {
+  helper.tableFindAll(req, res, QuoteCategory, { order: [['name', 'ASC']] }, 'quote categories');
+};
+
