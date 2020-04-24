@@ -66,6 +66,19 @@ export default class Helper {
       });
   };
 
+  tableFindPromise = (table, config) => {
+    return new Promise((resolve, reject) => {
+      table.findOne(config)
+        .then(response => {
+          resolve(response);
+        })
+        .catch(error => {
+          console.error(error);
+          reject(error);
+        });
+    });
+  };
+
   convertJsonObject = (obj) => {
     return JSON.stringify(obj);
   };

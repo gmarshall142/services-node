@@ -5,6 +5,7 @@ import logger from 'morgan';
 import bodyParser from 'body-parser';
 import menuRoutes from './routes/menuRoutes';
 import quoteRoutes from './routes/quoteRoutes';
+import noteRoutes from './routes/noteRoutes';
 import sequelize from './database/sequelize';
 
 const app = express();
@@ -25,7 +26,16 @@ sequelize
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'pug');
 
-app.use(cors());
+app.use(cors(
+  {
+    credentials: true,
+    origin: [
+      'http://localhost:8080',
+      'http://www.appfactory.com:8080',
+      'http://www.appfactory.com',
+      'https://www.appfactory.com'
+    ]
+  }));
 app.use(logger('dev', {
   skip: () => app.get('env') === 'test'
 }));
@@ -45,6 +55,7 @@ app.use('/about', router);
 
 app.use('/menus', menuRoutes);
 app.use('/quotes', quoteRoutes);
+app.use('/notes', noteRoutes);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
