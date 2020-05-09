@@ -12,15 +12,21 @@ const app = express();
 const router = express.Router();
 app.disable('x-powered-by');
 
-// connect to sequelize
-sequelize
-  .authenticate()
-  .then( () => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database: ', err);
-  });
+// connect to sequelize; added retries for docker connections
+let isConnected = false;
+let cnt = 0;
+do {
+  sequelize
+    .authenticate()
+    .then( () => {
+      console.log('Connection has been established successfully.');
+      isConnected = true;
+    })
+    .catch(err => {
+      console.error(`Unable to connect to the database: cnt: ${cnt}: `, err);
+      setTimeout(() => {}, 1000);
+    });
+} while(!isConnected && cnt < 10);
 
 // View engine setup
 app.set('views', path.join(__dirname, '../views'));
