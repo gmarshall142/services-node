@@ -3,12 +3,10 @@ import sequelize from '../database/sequelize';
 import NoteTopic from "./NoteTopic";
 
 const Note = sequelize.define('notes', {
-  comment: { type: Sequelize.STRING, allowNull: true },
   topicid: { type: Sequelize.INTEGER, allowNull: false },
+  comment: { type: Sequelize.STRING, allowNull: true },
   notetext: { type: Sequelize.STRING, allowNull: false },
-  jsondata: { type: Sequelize.JSON, allowNull: true },
-  createdat: { type: Sequelize.DATE },
-  updatedat: { type: Sequelize.DATE }
+  jsondata: { type: Sequelize.JSON, allowNull: true }
 },
 {
   timestamps: true,

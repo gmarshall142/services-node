@@ -1,11 +1,16 @@
 import sequelize from '../database/sequelize';
 import QueryTypes from "sequelize";
 import Helper from '../modules/helper';
+
 const _ = require('lodash');
 const helper = new Helper();
 
 exports.menuFindAll = (req, res) => {
-  sequelize.query('select * from menusFindAll();')
+  const permissions = req.user ? helper.formatArray(req.user.userPermissions) : '{}';
+
+  sequelize.query('select * from menusfindall(:permissions);',
+    {replacements: { permissions: permissions} }
+  )
     .then(response => {
       const data = response[0];
       const menuitems = _.filter(data, (item) => {
@@ -22,6 +27,7 @@ exports.menuFindAll = (req, res) => {
       apps.forEach((it, idx) => {
         menuitems.splice(pos + idx, 0, it);
       });
+      clearEmptyNodes(menuitems);
       res.json(menuitems);
     })
     .catch(error => {
@@ -31,12 +37,25 @@ exports.menuFindAll = (req, res) => {
     });
 };
 
+function clearEmptyNodes(menuItems) {
+  _.remove(menuItems, menu => {
+    if(menu.pageid === 0 && menu.children.length === 0) {
+      console.log(`menu: ${menu.label}`);
+      return true;
+    } else {
+      clearEmptyNodes(menu.children);
+    }
+  })
+}
+
 function getSubmenus(menuItem, menuData) {
   const children = [];
   _.forEach(menuItem.subitems, (it) => {
     const childItem = _.find(menuData, (data) => {return data.id === it;});
-    getSubmenus(childItem, menuData);
-    children.push(childItem);
+    if(childItem) {
+      getSubmenus(childItem, menuData);
+      children.push(childItem);
+    }
   });
   menuItem.children = _.sortBy(children, (child) => { return child.itemposition; });
   menuItem.routingPath = getRoutingPath(menuItem);

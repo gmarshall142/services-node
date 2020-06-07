@@ -122,5 +122,17 @@ export default class Helper {
   unescapeString = (str) => {
     return _.unescape(str);
   };
+
+// const fieldIds = "{ 17, 18, 26, 19, 20, 21, 22, 23, 24, 27 }";
+// const fieldVals = "{ null, 4, 3, 1, 1, Submit Custom Form, 2018-09-12 10:33:14.815409, null, 3575, Work to handle form submission }";
+  /**
+   * Converts array into array formatted for SQL
+   *
+   * @return String
+   */
+  formatArray = (arr) => {
+    return `{${_.join(arr)}}`;
+  };
+
 }
 

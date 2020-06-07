@@ -10,23 +10,44 @@ import sequelize from './database/sequelize';
 
 const app = express();
 const router = express.Router();
+// const jwt = require('express-jwt');
+// const jwtAuthz = require('express-jwt-authz');
+// const jwksRsa = require('jwks-rsa');
+//
+// // Authentication middleware. When used, the
+// // Access Token must exist and be verified against
+// // the Auth0 JSON Web Key Set
+// const authJwtSession = jwt({
+//   // Dynamically provide a signing key
+//   // based on the kid in the header and
+//   // the signing keys provided by the JWKS endpoint.
+//   secret: jwksRsa.expressJwtSecret({
+//     cache: true,
+//     rateLimit: true,
+//     jwksRequestsPerMinute: 5,
+//     jwksUri: `https://dev-rn77drwl.auth0.com/.well-known/jwks.json`
+//   }),
+//
+//   // Validate the audience and the issuer.
+//   audience: 'https://gmarshall.us',
+//   issuer: `https://dev-rn77drwl.auth0.com/`,
+//   algorithms: ['RS256']
+// });
+
 app.disable('x-powered-by');
 
 // connect to sequelize; added retries for docker connections
 let isConnected = false;
 let cnt = 0;
-do {
-  sequelize
-    .authenticate()
-    .then( () => {
-      console.log('Connection has been established successfully.');
-      isConnected = true;
-    })
-    .catch(err => {
-      console.error(`Unable to connect to the database: cnt: ${cnt}: `, err);
-      setTimeout(() => {}, 1000);
-    });
-} while(!isConnected && cnt < 10);
+sequelize
+  .authenticate()
+  .then( () => {
+    console.log('Connection has been established successfully.');
+    isConnected = true;
+  })
+  .catch(err => {
+    console.error(`Unable to connect to the database: cnt: ${cnt}: `, err);
+  });
 
 // View engine setup
 app.set('views', path.join(__dirname, '../views'));

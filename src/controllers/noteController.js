@@ -17,6 +17,10 @@ exports.noteTopicsAdd = (req, res) => {
   helper.tableAdd(req, res, NoteTopic, 'topics');
 };
 
+exports.notesFindAll = (req, res) => {
+  helper.tableFindAll(req, res, Note, {}, 'notes')
+};
+
 exports.notesFind = (req, res) => {
   helper.tableFindPromise(
     Note,

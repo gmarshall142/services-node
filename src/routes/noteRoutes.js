@@ -13,12 +13,12 @@ const noteRoutes = Router();
 noteRoutes.get('/topics/', controller.noteTopicsFindAll);
 noteRoutes.post('/topics/', controller.noteTopicsAdd);
 
+noteRoutes.get('/', controller.notesFindAll);
 noteRoutes.get('/:noteId', controller.notesFind);
 noteRoutes.post('/', controller.notesAdd);
 noteRoutes.put('/:noteId', controller.notesUpdate);
 noteRoutes.delete('/:noteId', controller.notesDelete);
 //
-// quoteRoutes.get('/', controller.quoteFindAll);
 // quoteRoutes.post('/', controller.quoteAdd);
 // quoteRoutes.get('/:quoteId', controller.quoteFind);
 // quoteRoutes.put('/:quoteId', controller.quoteUpdate);
