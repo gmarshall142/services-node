@@ -1,6 +1,6 @@
-DROP FUNCTION IF EXISTS menusFindAll;
+drop function IF EXISTS menusFindAll;
 
-create function menusfindall(idpermissions INTEGER[])
+create function menusfindall(idpermissions integer[])
     returns
         TABLE
         (
@@ -24,8 +24,8 @@ DECLARE
     user_role RECORD;
     user_roles CURSOR (id INTEGER) FOR SELECT * FROM app.getUserRoles(id);
 
-BEGIN
-    RAISE NOTICE 'permissionids: %', idpermissions;
+begin
+    raise NOTICE 'permissionids: %', idpermissions;
 
     --     IF (iduser IS NOT NULL) THEN
 --         OPEN user_roles(iduser);
@@ -58,4 +58,4 @@ BEGIN
 END;
 $$;
 
-ALTER FUNCTION menusFindAll OWNER TO gmarshall;
+alter function menusFindAll OWNER TO gmarshall;

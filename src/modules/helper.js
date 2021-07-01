@@ -1,4 +1,10 @@
+const formidable = require('formidable');
+const uuidv1 = require('uuid/v1');
+const fs = require('fs');
 const _ = require('lodash');
+
+const __volumename = `${process.env.GEMAPPS_VOLUME_PATH}/files`;
+const __attachmentsdir = 'attachments';
 
 export default class Helper {
 
@@ -63,6 +69,17 @@ export default class Helper {
         console.error(error);
         res.status(400);
         res.send(`Find all ${name} failed.`);
+      });
+  };
+
+  tableFind = (res, table, id, name) => {
+    table.findById(id)
+      .then(response => {
+        res.json(response);
+      })
+      .catch(error => {
+        console.error(error);
+        res.status(400).send(`Find ${name} failed.`);
       });
   };
 
@@ -134,5 +151,66 @@ export default class Helper {
     return `{${_.join(arr)}}`;
   };
 
+  checkDirPath(dirPath) {
+    try {
+      fs.statSync(dirPath).isDirectory();
+    } catch (e) {
+      if(e.code === 'ENOENT') {
+        fs.mkdir(dirPath, { recursive: true }, (err) => {
+          if(err) {
+            console.error(err);
+            throw err;
+          }
+        });
+      } else {
+        console.error(e);
+        throw e;
+      }
+    }
+  };
+
+  processForm = (req, res, dir, funcs) => {
+    const uuid = uuidv1();
+    const form = new formidable.IncomingForm();
+    form.parse(req);
+
+    form.on('fileBegin', (name, file) => {
+      file.uniqueName = `${uuid}_${file.name}`;
+      file.path = `${__volumename}/${__attachmentsdir}/${dir}/${file.uniqueName}`;
+    });
+
+    form.on('file', (name, file) => {
+      if(funcs.file) {
+        funcs.file(name, file);
+      }
+    });
+
+    form.on('field', (name, val) => {
+      if(funcs.field) {
+        funcs.field(name, val);
+      }
+    });
+
+    form.on('end', () => {
+      if(funcs.end) {
+        funcs.end(res);
+      } else {
+        res.status(200);
+        res.send(`upload complete.`);
+      }
+    });
+  };
+
+  getServerUrl = () => {
+    const protocol = process.env.VUE_APP_PROTOCOL ? process.env.VUE_APP_PROTOCOL : 'http';
+    const host = process.env.VUE_APP_REST_HOST;
+    const port = process.env.VUE_APP_REST_PORT;
+    const portStr = !port || port === '' ? '' : `:${port}`;
+    const url = `${protocol}://${host}${portStr}`;
+    console.debug('====================================');
+    console.debug(`url: ${url}   PORT: ${process.env.VUE_APP_REST_PORT}`);
+    console.debug('====================================');
+    return url;
+  };
 }
 

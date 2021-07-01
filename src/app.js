@@ -80,9 +80,11 @@ router.get('/about', (req, res) => {
 });
 app.use('/about', router);
 
+app.use('/master', require('./routes/masterRoutes').default);
 app.use('/menus', menuRoutes);
 app.use('/quotes', quoteRoutes);
 app.use('/notes', noteRoutes);
+app.use('/files', require('./routes/fileRoutes').default);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {

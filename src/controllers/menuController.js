@@ -40,7 +40,7 @@ exports.menuFindAll = (req, res) => {
 function clearEmptyNodes(menuItems) {
   _.remove(menuItems, menu => {
     if(menu.pageid === 0 && menu.children.length === 0) {
-      console.log(`menu: ${menu.label}`);
+      //console.log(`menu: ${menu.label}`);
       return true;
     } else {
       clearEmptyNodes(menu.children);

@@ -11,6 +11,7 @@ const noteRoutes = Router();
 // });
 
 noteRoutes.get('/topics/', controller.noteTopicsFindAll);
+noteRoutes.get('/topics/:topicId', controller.noteTopicsFind);
 noteRoutes.post('/topics/', controller.noteTopicsAdd);
 
 noteRoutes.get('/', controller.notesFindAll);
