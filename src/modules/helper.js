@@ -73,7 +73,7 @@ export default class Helper {
   };
 
   tableFind = (res, table, id, name) => {
-    table.findById(id)
+    table.findByPk(id)
       .then(response => {
         res.json(response);
       })
